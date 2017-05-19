@@ -1,0 +1,8 @@
+/public/demo
+/vendor
+/node_modules
+.env
+.idea
+/backup
+/none
+/components

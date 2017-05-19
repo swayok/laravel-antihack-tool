@@ -1,0 +1,30 @@
+{
+    "name": "swayok/laravel-antihack-tool",
+    "type": "library",
+    "description": "Active anti-hack protection for Laravel",
+    "keywords": [
+        "php",
+        "laravel",
+        "service provider",
+		"antihack",
+		"hack protection"
+    ],
+    "authors": [
+        {
+            "name": "Alexander Filippov"
+        }
+    ],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/swayok/laravel-antihack-tool/issues"
+    },
+    "autoload": {
+        "psr-0": {
+            "LaravelAntihackTool": "/src"
+        }
+    },
+    "require": {
+        "php": ">=5.5",
+        "laravel/framework": ">=5.2"
+    }
+}
