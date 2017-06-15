@@ -3,7 +3,6 @@
 namespace LaravelAntihackTool;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 
 class AntihackBlacklistCommand extends Command {
 
@@ -46,10 +45,10 @@ class AntihackBlacklistCommand extends Command {
         $duration = (int)config('antihack.blacklist_cache_duration', 60);
         $blacklistedIps = [];
         if (config('antihack.store_hack_attempts')) {
-            $blacklistedIps = \Db::connection(config('antihack.connection'))
+            $blacklistedIps = \DB::connection(config('antihack.connection'))
                 ->table(config('antihack.table_name'))
                 ->select(['ip'])
-                ->whereRaw('COUNT(*) > :treshold', ['treshold' => max((int)config('antihack.ban_theshold'), 1)])
+                ->havingRaw('COUNT(*) > :treshold', ['treshold' => max((int)config('antihack.ban_theshold'), 1)])
                 ->groupBy(['ip'])
                 ->get(['id'])
                 ->toArray();

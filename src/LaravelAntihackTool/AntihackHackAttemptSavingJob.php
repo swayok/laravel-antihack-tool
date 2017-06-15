@@ -4,12 +4,12 @@ namespace LaravelAntihackTool;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Jobs\Job;
 
-class AntihackHackAttemptSavingJob extends Job implements ShouldQueue {
+class AntihackHackAttemptSavingJob implements ShouldQueue {
 
-    use InteractsWithQueue, Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable;
 
     protected $intruderIpAddress;
 

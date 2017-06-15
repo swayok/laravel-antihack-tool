@@ -49,21 +49,27 @@ class AntihackInstallCommand extends Command {
                 $this->line('- migration ' . $filePath . ' already exist. skipped.');
                 return;
             }
-            $className = 'Create' . $groupName . 'Table';
-            $extendsClass = 'Cms' . $groupName . 'Migration';
+            if (!$this->files->isDirectory($migrationsPath)) {
+                $this->files->makeDirectory($migrationsPath, 0755, true);
+            }
             $fileContents = <<<FILE
-    <?php 
-    
-    use LaravelAntihackTool\CreateTableHackAttemptsMigration;
-    
-    class CreateTableHackAttempts extends CreateTableHackAttemptsMigration {
-    
-    }
+<?php 
+
+use LaravelAntihackTool\CreateTableHackAttemptsMigration;
+
+class CreateTableHackAttempts extends CreateTableHackAttemptsMigration {
+
+}
 
 FILE;
             $this->files->put($filePath, $fileContents);
             $this->files->chmod($filePath, 0664);
-            $this->line('Hach attempts table creation migration added');
+            $this->line('Hack attempts table creation migration added');
+            if ($this->confirm('Run "artisan migrate".', false)) {
+                \Artisan::call('migrate');
+            }
+        } else {
+            $this->error('Configuration option "antihack.store_hack_attempts" is set to false. Enable it and try again.');
         }
     }
 }

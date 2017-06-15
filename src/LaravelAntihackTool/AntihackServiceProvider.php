@@ -2,13 +2,17 @@
 
 namespace LaravelAntihackTool;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Database\Query\Expression;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
+use LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsScaffoldConfig;
+use LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsTable;
+use PeskyCMF\Config\CmfConfig;
 use Symfony\Component\Console\Output\NullOutput;
 
+/**
+ * @property Application $app
+ */
 class AntihackServiceProvider extends ServiceProvider {
 
     use DispatchesJobs;
@@ -21,6 +25,7 @@ class AntihackServiceProvider extends ServiceProvider {
             if (config('antihack.protector_enabled', true)) {
                 $this->runProtector();
             }
+            $this->addSectionToPeskyCmfConfig();
         }
     }
 
@@ -73,10 +78,29 @@ class AntihackServiceProvider extends ServiceProvider {
                 AntihackProtection::run($allowPhpExtensionInUrl, $allowLocalhostIp);
             } catch (HackAttemptException $exc) {
                 $this->saveExceptionToDb($exc);
-                throw new $exc;
+                throw $exc;
             }
         } else {
             AntihackProtection::run($allowPhpExtensionInUrl, $allowLocalhostIp);
+        }
+    }
+
+    protected function addSectionToPeskyCmfConfig() {
+        if (config('antihack.store_hack_attempts') && class_exists('\PeskyCMF\Config\CmfConfig')) {
+            $this->loadTranslationsFrom(__DIR__ . '/PeskyCmf/locale' , 'antihack');
+            $cmfConfig = \PeskyCMF\Config\CmfConfig::getPrimary();
+            $cmfConfig::addMenuItem('hack_attempts', function () {
+                return [
+                    'label' => trans('antihack::antihack.hack_attempts.menu_title'),
+                    'url' => routeToCmfItemsTable('hack_attempts'),
+                    'icon' => 'fa fa-shield'
+                ];
+            });
+            $cmfConfig::registerDbTableAndScaffoldConfig(
+                CmfHackAttemptsTable::getInstance(),
+                CmfHackAttemptsScaffoldConfig::class,
+                'hack_attempts'
+            );
         }
     }
 
@@ -113,7 +137,7 @@ class AntihackServiceProvider extends ServiceProvider {
             ->table(config('antihack.table_name'))
             ->insert([
                 'ip' => $getIntruderIpAddress,
-                'user_agent' => $getIntruderIpAddress,
+                'user_agent' => $getIntruderUserAgent,
             ]);
     }
 

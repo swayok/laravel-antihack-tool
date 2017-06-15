@@ -19,6 +19,8 @@ class HackAttemptException extends HttpException {
      * @param int $code
      */
     public function __construct($intruderIpAddress, $userAgent, \Exception $previous = null, array $headers = array(), $code = 0) {
+        $this->intruderIpAddress = $intruderIpAddress;
+        $this->intruderUserAgent = $userAgent;
         /* HTTP 406 - Not Acceptable is best suited code IMHO */
         $message = 'Request cannot be accepted due to probability of harmful code in it. Continuous attemts may result in IP ban.';
         parent::__construct(406, $message, $previous, $headers, $code);
