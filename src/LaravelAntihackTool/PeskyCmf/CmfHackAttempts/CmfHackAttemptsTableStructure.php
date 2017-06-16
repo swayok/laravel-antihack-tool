@@ -20,7 +20,11 @@ class CmfHackAttemptsTableStructure extends TableStructure {
      * @return string
      */
     static public function getTableName() {
-        return 'hack_attempts';
+        return config('antihack.table_name', 'hack_attempts');
+    }
+
+    static public function getConnectionName() {
+        return config('antihack.connection', 'default');
     }
 
     private function ip() {

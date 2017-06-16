@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelAntihackTool;
+namespace LaravelAntihackTool\Command;
 
 use Illuminate\Console\Command;
 
@@ -50,7 +50,8 @@ class AntihackBlacklistCommand extends Command {
                 ->select(['ip'])
                 ->havingRaw('COUNT(*) > :treshold', ['treshold' => max((int)config('antihack.ban_theshold'), 1)])
                 ->groupBy(['ip'])
-                ->get(['id'])
+                ->get()
+                ->pluck('ip')
                 ->toArray();
         }
         if ($duration > 0) {

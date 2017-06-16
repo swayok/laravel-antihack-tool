@@ -1,0 +1,1 @@
+@include('antihack::errors.error', ['httpCode' => 406])

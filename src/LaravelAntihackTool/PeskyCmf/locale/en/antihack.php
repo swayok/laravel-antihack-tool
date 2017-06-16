@@ -39,5 +39,16 @@ return [
                 'created_at' => 'Created',
             ]
         ]
-    ]
+    ],
+    'error_page' => [
+        'back_to_home_page' => 'Back to home page',
+        '406' => [
+            'page_title' => 'Server security violation detected',
+            'text' => 'Request cannot be accepted due to probability of harmful code in it. Continuous attemts may result in IP ban.',
+        ],
+        '423' => [
+            'page_title' => 'Access to web site was blocked',
+            'text' => 'Your IP address was blocked due to excessive amount of malicious requests. If you think you was banned by mistake - contact site administration',
+        ],
+    ],
 ];

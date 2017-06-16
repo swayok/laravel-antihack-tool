@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelAntihackTool;
+namespace LaravelAntihackTool\Command;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;

@@ -5,6 +5,8 @@ namespace LaravelAntihackTool;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\ServiceProvider;
+use LaravelAntihackTool\Command\AntihackBlacklistCommand;
+use LaravelAntihackTool\Command\AntihackInstallCommand;
 use LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsScaffoldConfig;
 use LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsTable;
 use PeskyCMF\Config\CmfConfig;
@@ -19,6 +21,8 @@ class AntihackServiceProvider extends ServiceProvider {
 
     public function boot() {
         if (!$this->app->runningInConsole()) {
+            $this->loadTranslationsFrom(__DIR__ . '/PeskyCmf/locale' , 'antihack');
+            $this->loadViewsFrom(__DIR__ . '/PeskyCmf/views' , 'antihack');
             if (config('antihack.blacklister_enabled', true)) {
                 $this->runBlacklister();
             }
@@ -52,21 +56,22 @@ class AntihackServiceProvider extends ServiceProvider {
     }
 
     protected function runBlacklister() {
+        // HTTP code 423 - Locked seems like best fit for bans
         $userAgent = AntihackProtection::getUserAgent();
         foreach ((array)config('antihack.blacklisted_user_agents') as $regexp) {
             if (preg_match($regexp, $userAgent)) {
-                abort(403, 'Your user agent is not allowed');
+                abort(423, 'Your user agent is not allowed');
             }
         }
         $ip = AntihackProtection::getClientIp();
         if (
-            !in_array($ip, (array)config('whitelisted_ip_addresses', []), true)
+            !in_array($ip, (array)config('antihack.whitelisted_ip_addresses', []), true)
             && (
-                in_array($ip, (array)config('blacklisted_ip_addresses', []), true)
+                in_array($ip, (array)config('antihack.blacklisted_ip_addresses', []), true)
                 || in_array($ip, $this->getBlacklistedIpAddresses(), true)
             )
         ) {
-            abort(403, 'Your IP address was blocked');
+            abort(423, 'Your IP address was blocked');
         }
     }
 
@@ -87,7 +92,6 @@ class AntihackServiceProvider extends ServiceProvider {
 
     protected function addSectionToPeskyCmfConfig() {
         if (config('antihack.store_hack_attempts') && class_exists('\PeskyCMF\Config\CmfConfig')) {
-            $this->loadTranslationsFrom(__DIR__ . '/PeskyCmf/locale' , 'antihack');
             $cmfConfig = \PeskyCMF\Config\CmfConfig::getPrimary();
             $cmfConfig::addMenuItem('hack_attempts', function () {
                 return [

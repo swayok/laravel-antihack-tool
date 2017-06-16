@@ -65,6 +65,6 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
     }
 
     public function translate($section, $suffix = '', array $parameters = []) {
-        return trans('antihack::antihack.' . rtrim("{$this->viewsBaseTranslationKey}.{$section}.$suffix", '.'), $parameters);
+        return trans('antihack::antihack.hack_attempts.' . rtrim("{$section}.{$suffix}", '.'), $parameters);
     }
 }
