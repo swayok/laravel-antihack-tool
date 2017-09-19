@@ -23,8 +23,8 @@ class CmfHackAttemptsTableStructure extends TableStructure {
         return config('antihack.table_name', 'hack_attempts');
     }
 
-    static public function getConnectionName() {
-        return config('antihack.connection', 'default');
+    static public function getConnectionName($writable) {
+        return config('antihack.connection', parent::getConnectionName($writable));
     }
 
     private function ip() {
