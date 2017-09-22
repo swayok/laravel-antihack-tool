@@ -2,7 +2,7 @@
 
 namespace LaravelAntihackTool\PeskyCmf\CmfHackAttempts;
 
-use PeskyCMF\Db\Traits\IdColumn;
+use PeskyORMLaravel\Db\TableStructureTraits\IdColumn;
 use PeskyORM\ORM\Column;
 use PeskyORM\ORM\TableStructure;
 
