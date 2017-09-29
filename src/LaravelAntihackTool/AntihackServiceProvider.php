@@ -100,11 +100,7 @@ class AntihackServiceProvider extends ServiceProvider {
                     'icon' => 'fa fa-shield'
                 ];
             });
-            $cmfConfig::registerDbTableAndScaffoldConfig(
-                CmfHackAttemptsTable::getInstance(),
-                CmfHackAttemptsScaffoldConfig::class,
-                'hack_attempts'
-            );
+            $cmfConfig::registerScaffoldConfigForResource('hack_attempts', CmfHackAttemptsScaffoldConfig::class);
         }
     }
 

@@ -14,7 +14,11 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
     protected $isCreateAllowed = false;
     protected $isEditAllowed = false;
     protected $isDeleteAllowed = true;
-    
+
+    static public function getTable() {
+        return CmfHackAttemptsTable::getInstance();
+    }
+
     protected function createDataGridConfig() {
         return parent::createDataGridConfig()
             ->setOrderBy('id', 'desc')
