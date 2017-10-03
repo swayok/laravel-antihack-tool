@@ -92,15 +92,10 @@ class AntihackServiceProvider extends ServiceProvider {
 
     protected function addSectionToPeskyCmfConfig() {
         if (config('antihack.store_hack_attempts') && class_exists('\PeskyCMF\Config\CmfConfig')) {
-            $cmfConfig = \PeskyCMF\Config\CmfConfig::getPrimary();
-            $cmfConfig::addMenuItem('hack_attempts', function () {
-                return [
-                    'label' => trans('antihack::antihack.hack_attempts.menu_title'),
-                    'url' => routeToCmfItemsTable('hack_attempts'),
-                    'icon' => 'fa fa-shield'
-                ];
-            });
-            $cmfConfig::registerScaffoldConfigForResource('hack_attempts', CmfHackAttemptsScaffoldConfig::class);
+            \PeskyCMF\Config\CmfConfig::getPrimary()->registerScaffoldConfigForResource(
+                'hack_attempts',
+                CmfHackAttemptsScaffoldConfig::class
+            );
         }
     }
 

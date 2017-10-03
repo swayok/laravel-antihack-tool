@@ -19,6 +19,14 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
         return CmfHackAttemptsTable::getInstance();
     }
 
+    static public function getMainMenuItem() {
+        return [
+            'label' => trans('antihack::antihack.hack_attempts.menu_title'),
+            'url' => routeToCmfItemsTable('hack_attempts'),
+            'icon' => 'fa fa-shield'
+        ];
+    }
+
     protected function createDataGridConfig() {
         return parent::createDataGridConfig()
             ->setOrderBy('id', 'desc')
