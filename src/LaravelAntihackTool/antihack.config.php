@@ -35,7 +35,7 @@ return [
      * pgsql and mysql connections are supported.
      * Todo: Add Redis support for antihack protection
      */
-    'connection' => env('ANTIHACK_CONNECTION', 'default'),
+    'connection' => env('ANTIHACK_CONNECTION'),
 
     /**
      * Name of DB table that stores hack attempts

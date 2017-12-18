@@ -40,7 +40,7 @@ class AntihackBlacklistCommand extends Command {
         parent::__construct();
     }
 
-    public function fire() {
+    public function handle() {
         $cacheKey = config('antihack.blacklist_cache_key', 'antihack.blacklist');
         $duration = (int)config('antihack.blacklist_cache_duration', 60);
         $blacklistedIps = [];
@@ -59,5 +59,9 @@ class AntihackBlacklistCommand extends Command {
         } else {
             \Cache::forever($cacheKey, $blacklistedIps);
         }
+    }
+
+    public function fire() {
+        $this->handle();
     }
 }

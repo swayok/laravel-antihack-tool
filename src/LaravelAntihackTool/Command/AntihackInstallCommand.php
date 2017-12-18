@@ -4,6 +4,7 @@ namespace LaravelAntihackTool\Command;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class AntihackInstallCommand extends Command {
 
@@ -41,7 +42,7 @@ class AntihackInstallCommand extends Command {
         parent::__construct();
     }
 
-    public function fire() {
+    public function handle() {
         if ($this->config->get('antihack.store_hack_attempts', false)) {
             $migrationsPath = database_path('migrations') . DIRECTORY_SEPARATOR;
             $filePath = $migrationsPath . "2014_10_12_100000_create_table_hack_attempts.php";
@@ -66,10 +67,15 @@ FILE;
             $this->files->chmod($filePath, 0664);
             $this->line('Hack attempts table creation migration added');
             if ($this->confirm('Run "artisan migrate".', false)) {
-                \Artisan::call('migrate');
+                $outputBuffer = new ConsoleOutput();
+                \Artisan::call('migrate', [], $this->getOutput());
             }
         } else {
             $this->error('Configuration option "antihack.store_hack_attempts" is set to false. Enable it and try again.');
         }
+    }
+
+    public function fire() {
+        $this->handle();
     }
 }
