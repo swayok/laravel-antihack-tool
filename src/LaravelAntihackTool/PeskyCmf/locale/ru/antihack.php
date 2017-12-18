@@ -9,14 +9,14 @@ return [
                 'id' => 'ID',
                 'ip' => 'IP-адрес',
                 'user_agent' => 'User agent',
-                'created_at' => 'Создана',
+                'created_at' => 'Cовершена',
             ],
             'filter' => [
                 'cmf_hack_attempts' => [
                     'id' => 'ID',
                     'ip' => 'IP-адрес',
                     'user_agent' => 'User agent',
-                    'created_at' => 'Создана',
+                    'created_at' => 'Cовершена',
                 ]
             ]
         ],
@@ -27,7 +27,7 @@ return [
                 'id' => 'ID',
                 'ip' => 'IP-адрес',
                 'user_agent' => 'User agent',
-                'created_at' => 'Создана',
+                'created_at' => 'Cовершена',
             ],
         ],
         'item_details' => [
@@ -36,7 +36,7 @@ return [
                 'id' => 'ID',
                 'ip' => 'IP-адрес',
                 'user_agent' => 'User agent',
-                'created_at' => 'Создана',
+                'created_at' => 'Cовершена',
             ]
         ]
     ],
