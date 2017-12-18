@@ -15,7 +15,7 @@ return [
     /**
      * Allow/disallow 127.0.0.1 IP in $_SERVER['REMOTE_ADDR']
      */
-    'allow_localhost_ip' => config('app.env') === 'local',
+    'allow_localhost_ip' => env('APP_ENV') === 'local',
 
     /**
      * Allow/disallow '.php' string in URL address;
