@@ -2,6 +2,8 @@
 
 namespace LaravelAntihackTool;
 
+use LaravelAntihackTool\Exception\HackAttemptException;
+
 abstract class AntihackProtection {
 
     const BAD_DATA_REGEXP = '%(<\?php|cgi-bin|php://|\?>|wget\s+|file_get_contents|system\s*\(|chmod\s+\(|chmod\s+-r|chmod\s+-\d\d\d|sys_get_temp_dir|suhosin|echo\(|echo\s+[\(\'"`])%i';
@@ -13,7 +15,7 @@ abstract class AntihackProtection {
      * @param bool $allowLocalhostIp - true: allow client's IP address to be 127.0.0.1 (use it for localhost environment)
      * @throws \BadMethodCallException
      * @throws \UnexpectedValueException
-     * @throws \LaravelAntihackTool\HackAttemptException
+     * @throws HackAttemptException
      */
     static public function run($allowPhpExtensionInUrl = false, $allowLocalhostIp = false) {
         if (!array_key_exists('REQUEST_URI', $_SERVER)) {

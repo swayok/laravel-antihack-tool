@@ -7,10 +7,10 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\ServiceProvider;
 use LaravelAntihackTool\Command\AntihackBlacklistCommand;
 use LaravelAntihackTool\Command\AntihackInstallCommand;
+use LaravelAntihackTool\Exception\RequestBannedException;
 use LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsScaffoldConfig;
-use LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsTable;
-use PeskyCMF\Config\CmfConfig;
 use Symfony\Component\Console\Output\NullOutput;
+use LaravelAntihackTool\Exception\HackAttemptException;
 
 /**
  * @property Application $app
@@ -60,7 +60,7 @@ class AntihackServiceProvider extends ServiceProvider {
         $userAgent = AntihackProtection::getUserAgent();
         foreach ((array)config('antihack.blacklisted_user_agents') as $regexp) {
             if (preg_match($regexp, $userAgent)) {
-                abort(423, 'Your user agent is not allowed');
+                throw new RequestBannedException('Your user agent is not allowed');
             }
         }
         $ip = AntihackProtection::getClientIp();
@@ -71,7 +71,7 @@ class AntihackServiceProvider extends ServiceProvider {
                 || in_array($ip, $this->getBlacklistedIpAddresses(), true)
             )
         ) {
-            abort(423, 'Your IP address was blocked');
+            throw new RequestBannedException('Your IP address was blocked.');
         }
     }
 

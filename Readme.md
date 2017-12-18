@@ -14,7 +14,7 @@ into `require` section and run `composer update`
 
 Service provider will be automatically loaded
 
-### For Laravel < 5.5
+### For Laravel 5.4-
 
 Add `LaravelAntihackTool\AntihackServiceProvider` to yor `app.providers` config
 
@@ -41,4 +41,16 @@ order to allow requests from `127.0.0.1` ip. By default this option is set to `t
 
 6. Whitelists and blacklists are generated automatically and cached to your default cache provider. 
 You may change cache key and duration configuration paramenters if you need. Also you may update 
-cache using `php artisan antihack:blacklist` manually
+cache using `php artisan antihack:blacklist` manually.
+
+7. There are 2 error templates in this package: `'antihack::errors.406'` 
+(hack detected) and `'antihack::errors.423'` (ip or user agent is blacklisted/banned).
+In Laravel 5.5+ you will need to modify your `App\Exceptions\Handler` class like this to use them:
+        
+        
+        public function prepareResponse($request, Exception $exception) {
+            if ($exception instanceof \LaravelAntihackTool\Exception\AntihackException) {
+                return response()->view('antihack::errors.' . $exception->getStatusCode());
+            }
+            return parent::prepareResponse($request, $exception);
+        }

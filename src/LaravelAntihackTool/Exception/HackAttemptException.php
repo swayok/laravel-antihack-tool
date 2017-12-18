@@ -1,10 +1,8 @@
 <?php
 
-namespace LaravelAntihackTool;
+namespace LaravelAntihackTool\Exception;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
-class HackAttemptException extends HttpException {
+class HackAttemptException extends AntihackException {
 
     /** @var string|null */
     protected $intruderIpAddress;
