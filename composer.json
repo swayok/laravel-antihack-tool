@@ -6,8 +6,8 @@
         "php",
         "laravel",
         "service provider",
-		"antihack",
-		"hack protection"
+        "antihack",
+        "hack protection"
     ],
     "authors": [
         {
@@ -21,6 +21,13 @@
     "autoload": {
         "psr-0": {
             "LaravelAntihackTool": "/src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelAntihackTool\\AntihackServiceProvider"
+            ]
         }
     },
     "require": {
