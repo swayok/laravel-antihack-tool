@@ -24,7 +24,7 @@ class CmfHackAttemptsTableStructure extends TableStructure {
     }
 
     static public function getConnectionName($writable) {
-        return config('antihack.connection', parent::getConnectionName($writable));
+        return config('antihack.connection') ?: parent::getConnectionName($writable);
     }
 
     private function ip() {
