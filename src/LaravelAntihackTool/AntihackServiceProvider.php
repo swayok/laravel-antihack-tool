@@ -2,15 +2,15 @@
 
 namespace LaravelAntihackTool;
 
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\ServiceProvider;
 use LaravelAntihackTool\Command\AntihackBlacklistCommand;
 use LaravelAntihackTool\Command\AntihackInstallCommand;
-use LaravelAntihackTool\Exception\RequestBannedException;
 use LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsScaffoldConfig;
-use Symfony\Component\Console\Output\NullOutput;
 use LaravelAntihackTool\Exception\HackAttemptException;
+use PeskyCMF\Config\CmfConfig;
 
 /**
  * @property Application $app
@@ -34,6 +34,9 @@ class AntihackServiceProvider extends ServiceProvider {
     }
 
     public function register() {
+        $loader = AliasLoader::getInstance();
+        $loader->alias('Antihack', Antihack::class);
+
         $this->app->singleton(
             'command.antihack.install',
             function ($app) {
@@ -43,8 +46,8 @@ class AntihackServiceProvider extends ServiceProvider {
 
         $this->app->singleton(
             'command.antihack.blacklist',
-            function ($app) {
-                return new AntihackBlacklistCommand($app['config'], $app['cache']);
+            function () {
+                return new AntihackBlacklistCommand();
             }
         );
 
@@ -56,23 +59,10 @@ class AntihackServiceProvider extends ServiceProvider {
     }
 
     protected function runBlacklister() {
-        // HTTP code 423 - Locked seems like best fit for bans
-        $userAgent = AntihackProtection::getUserAgent();
-        foreach ((array)config('antihack.blacklisted_user_agents') as $regexp) {
-            if (preg_match($regexp, $userAgent)) {
-                throw new RequestBannedException('Your user agent is not allowed');
-            }
-        }
-        $ip = AntihackProtection::getClientIp();
-        if (
-            !in_array($ip, (array)config('antihack.whitelisted_ip_addresses', []), true)
-            && (
-                in_array($ip, (array)config('antihack.blacklisted_ip_addresses', []), true)
-                || in_array($ip, $this->getBlacklistedIpAddresses(), true)
-            )
-        ) {
-            throw new RequestBannedException('Your IP address was blocked.');
-        }
+        Antihack::protectFromBlacklistedRequesters(
+            Antihack::getBlacklistedUserAgents(),
+            Antihack::getBlacklistedIpAddresses()
+        );
     }
 
     protected function runProtector() {
@@ -80,19 +70,19 @@ class AntihackServiceProvider extends ServiceProvider {
         $allowPhpExtensionInUrl = config('antihack.allow_php_extension_in_url', false);
         if (config('antihack.store_hack_attempts', false)) {
             try {
-                AntihackProtection::run($allowPhpExtensionInUrl, $allowLocalhostIp);
+                Antihack::analyzeRequestData($allowPhpExtensionInUrl, $allowLocalhostIp);
             } catch (HackAttemptException $exc) {
                 $this->saveExceptionToDb($exc);
                 throw $exc;
             }
         } else {
-            AntihackProtection::run($allowPhpExtensionInUrl, $allowLocalhostIp);
+            Antihack::analyzeRequestData($allowPhpExtensionInUrl, $allowLocalhostIp);
         }
     }
 
     protected function addSectionToPeskyCmfConfig() {
         if (config('antihack.store_hack_attempts') && class_exists('\PeskyCMF\Config\CmfConfig')) {
-            \PeskyCMF\Config\CmfConfig::getPrimary()->registerScaffoldConfigForResource(
+            CmfConfig::getPrimary()->registerScaffoldConfigForResource(
                 'hack_attempts',
                 CmfHackAttemptsScaffoldConfig::class
             );
@@ -105,34 +95,25 @@ class AntihackServiceProvider extends ServiceProvider {
     protected function saveExceptionToDb(HackAttemptException $exc) {
         if (config('antihack.use_queue')) {
             $this->dispatch(
-                new AntihackHackAttemptSavingJob($exc->getIntruderIpAddress(), $exc->getIntruderUserAgent())
+                new AntihackHackAttemptSavingJob($exc->getIntruderIpAddress(), $exc->getIntruderUserAgent(), $exc->getReason())
             );
         } else {
-            static::saveHackAttemptToDb($exc->getIntruderIpAddress(), $exc->getIntruderUserAgent());
+            static::saveHackAttemptToDb($exc->getIntruderIpAddress(), $exc->getIntruderUserAgent(), $exc->getReason());
         }
-    }
-
-    /**
-     * @return array
-     */
-    protected function getBlacklistedIpAddresses() {
-        $cacheKey = config('antihack.blacklist_cache_key', 'antihack.blacklist');
-        if (!\Cache::has($cacheKey)) {
-            \Artisan::call('antihack:blacklist', [], new NullOutput);
-        }
-        return (array)\Cache::get($cacheKey, []);
     }
 
     /**
      * @param string|null $getIntruderIpAddress
      * @param string|null $getIntruderUserAgent
+     * @param string|null $reason
      */
-    static public function saveHackAttemptToDb($getIntruderIpAddress, $getIntruderUserAgent) {
+    static public function saveHackAttemptToDb($getIntruderIpAddress, $getIntruderUserAgent, $reason) {
         \DB::connection(config('antihack.connection'))
             ->table(config('antihack.table_name'))
             ->insert([
                 'ip' => $getIntruderIpAddress,
                 'user_agent' => $getIntruderUserAgent,
+                'reason' => $reason
             ]);
     }
 

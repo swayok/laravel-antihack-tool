@@ -10,6 +10,8 @@ use PeskyORM\ORM\TableStructure;
  * @property-read Column    $id
  * @property-read Column    $ip
  * @property-read Column    $user_agent
+ * @property-read Column    $reason
+ * @property-read Column    $extra
  * @property-read Column    $created_at
  */
 class CmfHackAttemptsTableStructure extends TableStructure {
@@ -35,6 +37,17 @@ class CmfHackAttemptsTableStructure extends TableStructure {
     private function user_agent() {
         return Column::create(Column::TYPE_STRING)
             ->convertsEmptyStringToNull();
+    }
+
+    private function reason() {
+        return Column::create(Column::TYPE_STRING)
+            ->convertsEmptyStringToNull();
+    }
+
+    private function extra() {
+        return Column::create(Column::TYPE_JSONB)
+            ->convertsEmptyStringToNull()
+            ->setDefaultValue('{}');
     }
 
     private function created_at() {

@@ -3,20 +3,32 @@
 return [
     'hack_attempts' => [
         'menu_title' => 'Попытки взлома',
+        'reason' => [
+            'Bad User Agent' => 'Плохой User Agent',
+            'Invalid IP address' => 'Невалидный IP адрес',
+            '.php detected in URL address' => '.php обнаружен в URL адресе',
+            'Bad URL address' => 'Плохой URL адрес',
+            'Bad URL Query data' => 'Плохие данные в URL',
+            'Bad POST data' => 'Плохие данные в POST',
+        ],
         'datagrid' => [
             'header' => 'Попытки взлома',
             'column' => [
                 'id' => 'ID',
-                'ip' => 'IP-адрес',
-                'user_agent' => 'User agent',
+                'ip' => 'IP адрес',
+                'user_agent' => 'User Agent',
                 'created_at' => 'Cовершена',
+                'reason' => 'Причина',
+                'extra' => 'Доп. Данные',
             ],
             'filter' => [
                 'cmf_hack_attempts' => [
                     'id' => 'ID',
-                    'ip' => 'IP-адрес',
+                    'ip' => 'IP адрес',
                     'user_agent' => 'User agent',
                     'created_at' => 'Cовершена',
+                    'reason' => 'Причина',
+                    'extra' => 'Доп. Данные',
                 ]
             ]
         ],
@@ -25,18 +37,22 @@ return [
             'header_edit' => 'Редактирование попытки взлома',
             'input' => [
                 'id' => 'ID',
-                'ip' => 'IP-адрес',
+                'ip' => 'IP адрес',
                 'user_agent' => 'User agent',
                 'created_at' => 'Cовершена',
+                'reason' => 'Причина',
+                'extra' => 'Доп. Данные',
             ],
         ],
         'item_details' => [
             'header' => 'Информация о попытке взлома',
             'field' => [
                 'id' => 'ID',
-                'ip' => 'IP-адрес',
+                'ip' => 'IP адрес',
                 'user_agent' => 'User agent',
                 'created_at' => 'Cовершена',
+                'reason' => 'Причина',
+                'extra' => 'Доп. Данные',
             ]
         ]
     ],

@@ -13,6 +13,8 @@ abstract class CreateTableHackAttemptsMigration extends Migration {
                 $table->increments('id');
                 $table->string('ip', 40)->nullable();
                 $table->string('user_agent')->nullable();
+                $table->string('reason')->nullable();
+                $table->jsonb('extra')->default('{}');
                 $table->timestampTz('created_at')->default(\DB::raw('NOW()'));
 
                 $table->index('ip');

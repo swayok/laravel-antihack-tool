@@ -2,11 +2,11 @@
 
 namespace LaravelAntihackTool\PeskyCmf\CmfHackAttempts;
 
-use PeskyCMF\Scaffold\NormalTableScaffoldConfig;
+use LaravelAntihackTool\Antihack;
+use PeskyCMF\Scaffold\DataGrid\ColumnFilter;
 use PeskyCMF\Scaffold\DataGrid\DataGridColumn;
 use PeskyCMF\Scaffold\Form\FormInput;
-use PeskyCMF\Scaffold\Form\InputRenderer;
-use PeskyCMF\Scaffold\ItemDetails\ValueCell;
+use PeskyCMF\Scaffold\NormalTableScaffoldConfig;
 
 class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
 
@@ -34,9 +34,14 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
                 'id',
                 'ip',
                 'user_agent',
+                'reason' => DataGridColumn::create()
+                    ->setValueConverter(function ($value) {
+                        return $this->translate('reason.' . $value);
+                    }),
                 'created_at',
             ])
             ->closeFilterByDefault()
+            ->setIsRowActionsColumnFixed(false)
             ->setMultiRowSelection(true)
             ->setIsBulkItemsDeleteAllowed(true)
             ->setIsFilteredItemsDeleteAllowed(true);
@@ -48,6 +53,11 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
                 'id',
                 'ip',
                 'user_agent',
+                'reason' => ColumnFilter::create()
+                    ->setInputType(ColumnFilter::INPUT_TYPE_MULTISELECT)
+                    ->setAllowedValues(function () {
+                        return $this->getReasonsOptions();
+                    }),
                 'created_at',
             ]);
     }
@@ -58,6 +68,8 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
                 'id',
                 'ip',
                 'user_agent',
+                'reason',
+                'extra',
                 'created_at',
             ]);
     }
@@ -67,7 +79,12 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
             ->setWidth(50)
             ->setFormInputs([
                 'ip',
-                'user_agent'
+                'user_agent',
+                'reason' => FormInput::create()
+                    ->setType(FormInput::TYPE_SELECT)
+                    ->setOptions(function () {
+                        return $this->getReasonsOptions();
+                    })
             ])
             ->setValidators(function () {
                 return [
@@ -79,4 +96,29 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
     public function translate($section, $suffix = '', array $parameters = []) {
         return trans('antihack::antihack.hack_attempts.' . rtrim("{$section}.{$suffix}", '.'), $parameters);
     }
+
+    protected function getReasonsOptions() {
+        $reasons = CmfHackAttempt::getReasons();
+        $options = [];
+        foreach ($reasons as $reason) {
+            $options[$reason] = $this->translate('reason.' . $reason);
+        }
+        return $options;
+    }
+
+    public function getCustomPage($pageName) {
+        if ($pageName === 'blacklist') {
+            return $this->getBlacklistPage();
+        }
+        return parent::getCustomPage($pageName);
+    }
+
+    public function getBlacklistPage() {
+        return view('antihack::pages.blacklist', [
+            'ipBlacklist' => Antihack::getBlacklistedIpAddresses(),
+            'ipWhitelist' => Antihack::getWhitelistedIpAddresses(),
+            'userAgentsBlacklist' => Antihack::getBlacklistedUserAgents()
+        ]);
+    }
+
 }

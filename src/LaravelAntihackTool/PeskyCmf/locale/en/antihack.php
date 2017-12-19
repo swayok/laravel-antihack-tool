@@ -10,6 +10,8 @@ return [
                 'ip' => 'IP address',
                 'user_agent' => 'User agent',
                 'created_at' => 'Created',
+                'reason' => 'Reason',
+                'extra' => 'Extra data',
             ],
             'filter' => [
                 'cmf_hack_attempts' => [
@@ -17,6 +19,8 @@ return [
                     'ip' => 'IP address',
                     'user_agent' => 'User agent',
                     'created_at' => 'Created',
+                    'reason' => 'Reason',
+                    'extra' => 'Extra data',
                 ]
             ]
         ],
@@ -28,6 +32,8 @@ return [
                 'ip' => 'IP address',
                 'user_agent' => 'User agent',
                 'created_at' => 'Created',
+                'reason' => 'Reason',
+                'extra' => 'Extra data',
             ],
         ],
         'item_details' => [
@@ -37,6 +43,8 @@ return [
                 'ip' => 'IP address',
                 'user_agent' => 'User agent',
                 'created_at' => 'Created',
+                'reason' => 'Reason',
+                'extra' => 'Extra data',
             ]
         ]
     ],
