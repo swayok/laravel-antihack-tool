@@ -16,7 +16,7 @@ abstract class Antihack {
 
     const REASON_BAD_USER_AGENT = 'Bad User Agent';
     const REASON_INVALID_IP_ADDRESS = 'Invalid IP address';
-    const REASON_PHP_EXTENSION_IN_URL = '.php detected in URL address';
+    const REASON_PHP_EXTENSION_IN_URL = 'Attempt to access PHP file directly';
     const REASON_BAD_URL = 'Bad URL address';
     const REASON_BAD_URL_QUERY_DATA = 'Bad URL Query data';
     const REASON_BAD_POST_DATA = 'Bad POST data';
@@ -122,17 +122,49 @@ abstract class Antihack {
         $cacheKey = config('antihack.blacklist_cache_key', 'antihack.blacklist');
         if ($ignoreCache || !\Cache::has($cacheKey)) {
             $blacklistedIps = [];
+            $whitelistedIps = static::getWhitelistedIpAddresses();
             if (config('antihack.store_hack_attempts')) {
-                $blacklistedIps = \DB::connection(config('antihack.connection'))
+                $query = \DB::connection(config('antihack.connection'))
                     ->table(config('antihack.table_name'))
                     ->select(['ip'])
-                    ->havingRaw('COUNT(*) > :treshold', ['treshold' => max((int)config('antihack.ban_theshold'), 1)])
-                    ->groupBy(['ip'])
-                    ->get()
-                    ->pluck('ip')
-                    ->toArray();
-                $blacklistedIps = array_merge($blacklistedIps, (array)config('antihack.blacklisted_ip_addresses', []));
-                $blacklistedIps = array_diff($blacklistedIps, static::getWhitelistedIpAddresses());
+                    ->whereNotNull('ip')
+                    ->havingRaw(
+                        'COUNT(*) >= ?',
+                        [max((int)config('antihack.permanent_ban_theshold'), 1)]
+                    )
+                    ->groupBy(['ip']);
+                if (count($whitelistedIps)) {
+                    $query->whereNotIn('ip', $whitelistedIps);
+                }
+                $blacklistedIps = $query->get()->pluck('ip')->toArray();
+
+                $tempBanTreshold = (int)config('antihack.temporary_ban_theshold');
+                $tempBanDuration = (int)config('antihack.temporary_ban_duration');
+                if ($tempBanTreshold > 0 && $tempBanDuration > 0) {
+                    $query = \DB::connection(config('antihack.connection'))
+                        ->table(config('antihack.table_name'))
+                        ->select(['ip'])
+                        ->whereNotNull('ip')
+                        ->whereRaw(
+                            'created_at >= ?',
+                            [date('Y-m-d H:i:s', strtotime("-{$tempBanDuration} hours"))]
+                        )
+                        ->whereNotIn('ip', $whitelistedIps)
+                        ->havingRaw(
+                            'COUNT(*) >= ?',
+                            [$tempBanTreshold,]
+                        )
+                        ->groupBy(['ip']);
+                    if (count($whitelistedIps)) {
+                        $query->whereNotIn('ip', $whitelistedIps);
+                    }
+                    $blacklistedIps = array_merge(
+                        $blacklistedIps,
+                        $query->get()->pluck('ip')->toArray()
+                    );
+                }
+
+                $blacklistedIps = array_merge($blacklistedIps, static::getBlacklistedByConfigIpAddresses());
             }
             $duration = (int)config('antihack.blacklist_cache_duration', 60);
             if ($duration > 0) {
@@ -143,6 +175,13 @@ abstract class Antihack {
             return $blacklistedIps;
         }
         return (array)\Cache::get($cacheKey);
+    }
+
+    /**
+     * @return array
+     */
+    static public function getBlacklistedByConfigIpAddresses() {
+        return (array)config('antihack.blacklisted_ip_addresses', []);
     }
 
     /**

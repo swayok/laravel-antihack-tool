@@ -6,7 +6,7 @@ return [
         'reason' => [
             'Bad User Agent' => 'Плохой User Agent',
             'Invalid IP address' => 'Невалидный IP адрес',
-            '.php detected in URL address' => '.php обнаружен в URL адресе',
+            'Attempt to access PHP file directly' => 'Попытка прямого доступа к PHP файлу',
             'Bad URL address' => 'Плохой URL адрес',
             'Bad URL Query data' => 'Плохие данные в URL',
             'Bad POST data' => 'Плохие данные в POST',

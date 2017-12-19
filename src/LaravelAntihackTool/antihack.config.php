@@ -50,8 +50,21 @@ return [
 
     /**
      * Minimal number of hack attempts needed to ban IP
+     * To disable set it to false or 0
      */
-    'ban_theshold' => env('ANTIHACK_BAN_THESHOLD', 20),
+    'temporary_ban_theshold' => env('ANTIHACK_TEMPORARY_BAN_THESHOLD', 20),
+
+    /**
+     * Duration of temporary ban in hours
+     */
+    'temporary_ban_duration' => env('ANTIHACK_TEMPORARY_BAN_DURATION', 120),
+
+    /**
+     * Minimal number of hack attempts needed to ban IP permanently
+     * Note that attempts during temporary ban are not recorded so this treshold
+     * should not be much higher then temporary ban treshold.
+     */
+    'permanent_ban_theshold' => env('ANTIHACK_PERMANENT_BAN_THESHOLD', 50),
 
     /**
      * Cache key to store blacklisted IP addresses
