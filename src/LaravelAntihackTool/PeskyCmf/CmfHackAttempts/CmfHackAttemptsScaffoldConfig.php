@@ -7,6 +7,7 @@ use PeskyCMF\Scaffold\DataGrid\ColumnFilter;
 use PeskyCMF\Scaffold\DataGrid\DataGridColumn;
 use PeskyCMF\Scaffold\Form\FormInput;
 use PeskyCMF\Scaffold\NormalTableScaffoldConfig;
+use Swayok\Html\Tag;
 
 class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
 
@@ -44,7 +45,18 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
             ->setIsRowActionsColumnFixed(false)
             ->setMultiRowSelection(true)
             ->setIsBulkItemsDeleteAllowed(true)
-            ->setIsFilteredItemsDeleteAllowed(true);
+            ->setIsFilteredItemsDeleteAllowed(true)
+            ->setToolbarItems(function () {
+                $ret = [];
+                if (\Gate::allows('resource.custom_page', [static::getResourceName(), 'blacklist'])) {
+                    $ret[] = Tag::a()
+                        ->setContent($this->translate('datagrid.toolbar', 'show_blacklist'))
+                        ->setClass('btn btn-default')
+                        ->setHref(routeToCmfResourceCustomPage(static::getResourceName(), 'blacklist'))
+                        ->setDataAttr('modal', '1');
+                }
+                return $ret;
+            });
     }
     
     protected function createDataGridFilterConfig() {
@@ -115,6 +127,8 @@ class CmfHackAttemptsScaffoldConfig extends NormalTableScaffoldConfig {
 
     public function getBlacklistPage() {
         return view('antihack::pages.blacklist', [
+            'scaffoldConfig' => $this,
+            'ipBlacklistByConfig' => Antihack::getBlacklistedByConfigIpAddresses(),
             'ipBlacklist' => Antihack::getBlacklistedIpAddresses(),
             'ipWhitelist' => Antihack::getWhitelistedIpAddresses(),
             'userAgentsBlacklist' => Antihack::getBlacklistedUserAgents()

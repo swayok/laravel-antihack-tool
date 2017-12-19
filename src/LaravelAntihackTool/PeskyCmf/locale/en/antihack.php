@@ -5,6 +5,9 @@ return [
         'menu_title' => 'Hack attempts',
         'datagrid' => [
             'header' => 'Hack attempts',
+            'toolbar' => [
+                'show_blacklist' => 'Blacklist'
+            ],
             'column' => [
                 'id' => 'ID',
                 'ip' => 'IP address',
@@ -46,7 +49,14 @@ return [
                 'reason' => 'Reason',
                 'extra' => 'Extra data',
             ]
-        ]
+        ],
+        'blacklist_page' => [
+            'page_title' => 'Blacklist of IP addresses and User Agents',
+            'whitelisted_ips' => 'Whitelisted IP addresses',
+            'blacklisted_ips_in_config' => 'Constantly blacklisted IP addresses',
+            'blacklisted_ips' => 'Currently blacklisted IP addresses',
+            'blacklisted_user_agents' => 'Blacklisted User Agents (Regexp patterns)',
+        ],
     ],
     'error_page' => [
         'back_to_home_page' => 'Back to home page',

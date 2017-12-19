@@ -13,10 +13,13 @@ return [
         ],
         'datagrid' => [
             'header' => 'Попытки взлома',
+            'toolbar' => [
+                'show_blacklist' => 'Черный список'
+            ],
             'column' => [
                 'id' => 'ID',
                 'ip' => 'IP адрес',
-                'user_agent' => 'User Agent',
+                'user_agent' => 'Браузер',
                 'created_at' => 'Cовершена',
                 'reason' => 'Причина',
                 'extra' => 'Доп. Данные',
@@ -25,7 +28,7 @@ return [
                 'cmf_hack_attempts' => [
                     'id' => 'ID',
                     'ip' => 'IP адрес',
-                    'user_agent' => 'User agent',
+                    'user_agent' => 'Браузер',
                     'created_at' => 'Cовершена',
                     'reason' => 'Причина',
                     'extra' => 'Доп. Данные',
@@ -38,7 +41,7 @@ return [
             'input' => [
                 'id' => 'ID',
                 'ip' => 'IP адрес',
-                'user_agent' => 'User agent',
+                'user_agent' => 'Браузер',
                 'created_at' => 'Cовершена',
                 'reason' => 'Причина',
                 'extra' => 'Доп. Данные',
@@ -49,12 +52,19 @@ return [
             'field' => [
                 'id' => 'ID',
                 'ip' => 'IP адрес',
-                'user_agent' => 'User agent',
+                'user_agent' => 'Браузер',
                 'created_at' => 'Cовершена',
                 'reason' => 'Причина',
                 'extra' => 'Доп. Данные',
             ]
-        ]
+        ],
+        'blacklist_page' => [
+            'page_title' => 'Черный список IP адресов и браузеров',
+            'whitelisted_ips' => 'Белый список IP адресов',
+            'blacklisted_ips_in_config' => 'Постоянно заблокированные IP адреса',
+            'blacklisted_ips' => 'Текущий черный список IP адресов',
+            'blacklisted_user_agents' => 'Черный список браузеров (RegExp-выражения)',
+        ],
     ],
     'error_page' => [
         'back_to_home_page' => 'Вернуться на главную',
