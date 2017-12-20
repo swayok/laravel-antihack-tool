@@ -26,6 +26,14 @@ return [
     'allow_php_extension_in_url' => false,
 
     /**
+     * Works together with 'allow_php_extension_in_url' => false to allow some set of directly
+     * available php scripts. List here full paths to a scripts like "/admin/script.php"
+     */
+    'whitelisted_php_scripts' => [
+
+    ],
+
+    /**
      * Enable/disable saving of hack attempts into DB
      */
     'store_hack_attempts' => env('ANTIHACK_STORE_HACK_ATTEMPTS', false),
@@ -33,7 +41,7 @@ return [
     /**
      * Connection where hack attempts will be stored.
      * pgsql and mysql connections are supported.
-     * Todo: Add Redis support for antihack protection
+     * In case of NULL value - config('database.default') connection will be used
      */
     'connection' => env('ANTIHACK_CONNECTION'),
 

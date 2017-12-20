@@ -68,15 +68,14 @@ class AntihackServiceProvider extends ServiceProvider {
     protected function runProtector() {
         $allowLocalhostIp = config('antihack.allow_localhost_ip', false);
         $allowPhpExtensionInUrl = config('antihack.allow_php_extension_in_url', false);
-        if (config('antihack.store_hack_attempts', false)) {
-            try {
-                Antihack::analyzeRequestData($allowPhpExtensionInUrl, $allowLocalhostIp);
-            } catch (HackAttemptException $exc) {
+        $whitelistedPhpScripts = Antihack::getWhitelistedPhpScripts();
+        try {
+            Antihack::analyzeRequestData($allowPhpExtensionInUrl, $whitelistedPhpScripts, $allowLocalhostIp);
+        } catch (HackAttemptException $exc) {
+            if (config('antihack.store_hack_attempts', false)) {
                 $this->saveExceptionToDb($exc);
-                throw $exc;
             }
-        } else {
-            Antihack::analyzeRequestData($allowPhpExtensionInUrl, $allowLocalhostIp);
+            throw $exc;
         }
     }
 

@@ -30,7 +30,7 @@ abstract class Antihack {
      * @throws \UnexpectedValueException
      * @throws \LaravelAntihackTool\Exception\HackAttemptException
      */
-    static public function analyzeRequestData($allowPhpExtensionInUrl = false, $allowLocalhostIp = false) {
+    static public function analyzeRequestData($allowPhpExtensionInUrl = false, array $whitelistedPhpScripts = [], $allowLocalhostIp = false) {
         if (!array_key_exists('REQUEST_URI', $_SERVER)) {
             throw new \BadMethodCallException(
                 'AntihackProtection requires $_SERVER[\'REQUEST_URI\'] to be set.'
@@ -56,7 +56,17 @@ abstract class Antihack {
         }
         if (!empty($_SERVER['REQUEST_URI'])) {
             if (!$allowPhpExtensionInUrl && stripos($_SERVER['REQUEST_URI'], '.php') !== false) {
-                throw new HackAttemptException($clientIp, $userAgent, static::REASON_PHP_EXTENSION_IN_URL);
+                $url = strtolower($_SERVER['REQUEST_URI']);
+                $isPhpScriptWhitelisted = false;
+                foreach ($whitelistedPhpScripts as $whitelistedUrl) {
+                    if (strtolower($url) === strtolower($whitelistedUrl)) {
+                        $isPhpScriptWhitelisted = true;
+                        break;
+                    }
+                }
+                if (!$isPhpScriptWhitelisted) {
+                    throw new HackAttemptException($clientIp, $userAgent, static::REASON_PHP_EXTENSION_IN_URL);
+                }
             }
             if (preg_match(static::BAD_URI_REGEXP, $_SERVER['REQUEST_URI'], $ret)) {
                 throw new HackAttemptException($clientIp, $userAgent, static::REASON_BAD_URL);
@@ -112,6 +122,13 @@ abstract class Antihack {
      */
     static public function sanitizeUserAgent($userAgent) {
         return trim(preg_replace(static::USER_AGENT_SANITIZER_REGEXP, '_', $userAgent));
+    }
+
+    /**
+     * @return array
+     */
+    static public function getWhitelistedPhpScripts() {
+        return (array)config('antihack.whitelisted_php_scripts', []);
     }
 
     /**
