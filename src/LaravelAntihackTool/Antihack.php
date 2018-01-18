@@ -81,39 +81,39 @@ abstract class Antihack {
         }
     }
 
+    static private $ip;
     /**
      * @return string
      * @throws \BadMethodCallException
      */
     static public function getClientIp() {
-        static $ip;
-        if ($ip === null) {
+        if (static::$ip === null) {
             if (empty($_SERVER['REMOTE_ADDR']) && empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
                 throw new \BadMethodCallException(
                     'AntihackProtection requires $_SERVER[\'REMOTE_ADDR\'] or $_SERVER[\'HTTP_X_FORWARDED_FOR\'] to be set.'
                         . ' Probably you\'re trying to run protection for a console command'
                 );
             }
-            $ip = empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+            static::$ip = empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
         }
-        return $ip;
+        return static::$ip;
     }
 
+    static private $userAgent;
     /**
      * @return null|string
      */
     static public function getUserAgent() {
-        static $userAgent;
-        if ($userAgent === null) {
-            $userAgent = false;
+        if (static::$userAgent === null) {
+            static::$userAgent = false;
             if (!empty($_SERVER['HTTP_USER_AGENT'])) {
-                $userAgent = static::sanitizeUserAgent($_SERVER['HTTP_USER_AGENT']);
-                if (preg_match('%^[ _-]*$%', $userAgent)) {
-                    $userAgent = false;
+                static::$userAgent = static::sanitizeUserAgent($_SERVER['HTTP_USER_AGENT']);
+                if (preg_match('%^[ _-]*$%', static::$userAgent)) {
+                    static::$userAgent = false;
                 }
             }
         }
-        return $userAgent ?: null;
+        return static::$userAgent ?: null;
     }
 
     /**
