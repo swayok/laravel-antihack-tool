@@ -8,6 +8,8 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\ServiceProvider;
 use LaravelAntihackTool\Command\AntihackBlacklistCommand;
 use LaravelAntihackTool\Command\AntihackInstallCommand;
+use LaravelAntihackTool\Exception\AntihackException;
+use LaravelAntihackTool\Exception\RequestBannedException;
 use LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsScaffoldConfig;
 use LaravelAntihackTool\Exception\HackAttemptException;
 use PeskyCMF\Config\CmfConfig;
@@ -21,16 +23,27 @@ class AntihackServiceProvider extends ServiceProvider {
 
     public function boot() {
         if (!$this->app->runningInConsole()) {
-            $this->loadTranslationsFrom(__DIR__ . '/PeskyCmf/locale' , 'antihack');
-            $this->loadViewsFrom(__DIR__ . '/PeskyCmf/views' , 'antihack');
-            if (config('antihack.blacklister_enabled', true)) {
-                $this->runBlacklister();
+            try {
+                if (config('antihack.blacklister_enabled', true)) {
+                    $this->runBlacklister();
+                }
+                if (config('antihack.protector_enabled', true)) {
+                    $this->runProtector();
+                }
+            } catch (AntihackException $exception) {
+                $this->loadViewsAndTranslations();
+                throw $exception;
             }
-            if (config('antihack.protector_enabled', true)) {
-                $this->runProtector();
+            if ($this->app->offsetExists('is_peskycmf_section') && $this->app->offsetGet('is_peskycmf_section')) {
+                $this->loadViewsAndTranslations();
+                $this->addSectionToPeskyCmfConfig();
             }
-            $this->addSectionToPeskyCmfConfig();
         }
+    }
+
+    protected function loadViewsAndTranslations() {
+        $this->loadTranslationsFrom(__DIR__ . '/PeskyCmf/locale' , 'antihack');
+        $this->loadViewsFrom(__DIR__ . '/PeskyCmf/views' , 'antihack');
     }
 
     public function register() {
@@ -58,6 +71,9 @@ class AntihackServiceProvider extends ServiceProvider {
         ], 'config');
     }
 
+    /**
+     * @throws RequestBannedException
+     */
     protected function runBlacklister() {
         Antihack::protectFromBlacklistedRequesters(
             Antihack::getBlacklistedUserAgents(),
@@ -65,6 +81,11 @@ class AntihackServiceProvider extends ServiceProvider {
         );
     }
 
+    /**
+     * @throws \BadMethodCallException
+     * @throws \UnexpectedValueException
+     * @throws \LaravelAntihackTool\Exception\HackAttemptException
+     */
     protected function runProtector() {
         $allowLocalhostIp = config('antihack.allow_localhost_ip', false);
         $allowPhpExtensionInUrl = config('antihack.allow_php_extension_in_url', false);
