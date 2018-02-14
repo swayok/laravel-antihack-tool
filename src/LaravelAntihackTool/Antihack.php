@@ -141,8 +141,14 @@ abstract class Antihack {
             $blacklistedIps = [];
             $whitelistedIps = static::getWhitelistedIpAddresses();
             if (config('antihack.store_hack_attempts')) {
-                $query = \DB::connection(config('antihack.connection'))
-                    ->table(config('antihack.table_name'))
+                $connectionName = config('antihack.connection') ?: config('database.default');
+                $table = config('antihack.table_name');
+                $connectionConfig = config('database.connections.' . $connectionName);
+                if (!empty($connectionConfig['schema'])) {
+                    $table = $connectionConfig['schema'] . '.' . $table;
+                }
+                $query = \DB::connection($connectionName)
+                    ->table($table)
                     ->select(['ip'])
                     ->whereNotNull('ip')
                     ->havingRaw(
