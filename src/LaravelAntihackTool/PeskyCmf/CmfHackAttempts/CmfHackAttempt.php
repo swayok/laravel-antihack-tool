@@ -20,7 +20,6 @@ use LaravelAntihackTool\Antihack;
  *
  * @method $this    setId($value, $isFromDb = false)
  * @method $this    setIp($value, $isFromDb = false)
- * @method $this    setUserAgent($value, $isFromDb = false)
  * @method $this    setReason($value, $isFromDb = false)
  * @method $this    setExtra($value, $isFromDb = false)
  * @method $this    setCreatedAt($value, $isFromDb = false)
@@ -29,6 +28,9 @@ class CmfHackAttempt extends AbstractRecord {
 
     /**
      * @return CmfHackAttemptsTable
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \BadMethodCallException
      */
     static public function getTable() {
         return CmfHackAttemptsTable::getInstance();
@@ -43,6 +45,19 @@ class CmfHackAttempt extends AbstractRecord {
             Antihack::REASON_BAD_URL_QUERY_DATA,
             Antihack::REASON_BAD_POST_DATA,
         ];
+    }
+
+    /**
+     * @param mixed $value
+     * @param bool $isFromDb
+     * @return $this
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \BadMethodCallException
+     * @throws \PeskyORM\Exception\InvalidDataException
+     */
+    public function setUserAgent($value, $isFromDb = false) {
+        return $this->updateValue('user_agent', mb_substr((string)$value, 0, 254), $isFromDb);
     }
 
 }
