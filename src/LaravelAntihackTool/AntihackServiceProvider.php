@@ -22,6 +22,7 @@ class AntihackServiceProvider extends ServiceProvider {
     use DispatchesJobs;
 
     public function boot() {
+        $this->mergeConfigFrom(__DIR__ . '/antihack.config.php', 'antihack');
         if (!$this->app->runningInConsole()) {
             try {
                 if (config('antihack.blacklister_enabled', true)) {
