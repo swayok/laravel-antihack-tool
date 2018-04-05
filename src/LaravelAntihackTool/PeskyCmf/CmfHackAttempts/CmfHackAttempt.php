@@ -12,7 +12,7 @@ use LaravelAntihackTool\Antihack;
  * @property-read null|string $reason
  * @property-read string      $extra
  * @property-read array       $extra_as_array
- * @property-read object      $extra_as_object
+ * @property-read \stdClass   $extra_as_object
  * @property-read string      $created_at
  * @property-read string      $created_at_as_date
  * @property-read string      $created_at_as_time
