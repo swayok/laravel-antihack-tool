@@ -25,6 +25,7 @@ abstract class Antihack {
      * Analyze request data on subject of harmful code in it
      * Note: do not run this in command line script!
      * @param bool $allowPhpExtensionInUrl - false: any url with ".php" in path will be blocked
+     * @param array $whitelistedPhpScripts
      * @param bool $allowLocalhostIp - true: allow client's IP address to be 127.0.0.1 (use it for localhost environment)
      * @throws \BadMethodCallException
      * @throws \UnexpectedValueException
@@ -51,7 +52,7 @@ abstract class Antihack {
         }
         if (!$allowLocalhostIp && $clientIp === '127.0.0.1') {
             throw new \UnexpectedValueException(
-                '$_SERVER[\'REMOTE_ADDR\'] is 127.0.0.1. Probably you need to reconfigure you web server or proxy to pass correct client\'s ip address'
+                '$_SERVER[\'REMOTE_ADDR\'] is 127.0.0.1. Probably you need to reconfigure you web server or proxy to pass correct client\'s ip address for url ' . $_SERVER['REQUEST_URI']
             );
         }
         if (!empty($_SERVER['REQUEST_URI'])) {
