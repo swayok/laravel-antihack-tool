@@ -144,10 +144,6 @@ abstract class Antihack {
             if (config('antihack.store_hack_attempts')) {
                 $connectionName = config('antihack.connection') ?: config('database.default');
                 $table = config('antihack.table_name');
-                $connectionConfig = config('database.connections.' . $connectionName);
-                if (!empty($connectionConfig['schema'])) {
-                    $table = $connectionConfig['schema'] . '.' . $table;
-                }
                 $query = \DB::connection($connectionName)
                     ->table($table)
                     ->select(['ip'])
