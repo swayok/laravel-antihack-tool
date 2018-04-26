@@ -35,9 +35,13 @@ class AntihackServiceProvider extends ServiceProvider {
                 $this->loadViewsAndTranslations();
                 throw $exception;
             }
-            if ($this->app->offsetExists('is_peskycmf_section') && $this->app->offsetGet('is_peskycmf_section')) {
-                $this->loadViewsAndTranslations();
-                $this->addSectionToPeskyCmfConfig();
+            if ($this->app->offsetExists('PeskyCMF\PeskyCmfManager')) {
+                /** @var \PeskyCMF\PeskyCmfManager $manager */
+                $manager = $this->app->offsetGet('PeskyCMF\PeskyCmfManager');
+                $manager->onSectionSet(function (CmfConfig $cmfConfig) {
+                    $this->loadViewsAndTranslations();
+                    $this->addSectionToPeskyCmfConfig($cmfConfig);
+                });
             }
         }
     }
@@ -101,9 +105,12 @@ class AntihackServiceProvider extends ServiceProvider {
         }
     }
 
-    protected function addSectionToPeskyCmfConfig() {
+    /**
+     * @param CmfConfig $cmfConfig
+     */
+    protected function addSectionToPeskyCmfConfig(CmfConfig $cmfConfig) {
         if (config('antihack.store_hack_attempts') && class_exists('\PeskyCMF\Config\CmfConfig')) {
-            CmfConfig::getPrimary()->registerScaffoldConfigForResource(
+            $cmfConfig::registerScaffoldConfigForResource(
                 'hack_attempts',
                 CmfHackAttemptsScaffoldConfig::class
             );
