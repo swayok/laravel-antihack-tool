@@ -18,6 +18,15 @@ Service provider will be automatically loaded
 
 Add `LaravelAntihackTool\AntihackServiceProvider` to yor `app.providers` config
 
+### Add section to your CMF section
+
+Add `\LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsScaffoldConfig::class` 
+to your cmf section's config (probably `config/admin.php`) into `'resources'` key:
+
+        'resources' => [
+            \LaravelAntihackTool\PeskyCmf\CmfHackAttempts\CmfHackAttemptsScaffoldConfig::class
+        }
+
 ## Configuration
 
 1. Run `php artisan vendor:publish --provider=LaravelAntihackTool\AntihackServiceProvider` 
